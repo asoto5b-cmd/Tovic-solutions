@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tovic Solutions</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+:root { --tovic-red: #e11d48; }
+.bg-tovic-red { background-color: var(--tovic-red); }
+.text-tovic-red { color: var(--tovic-red); }
+
+.page { display:none; }
+.page.active { display:block; }
+</style>
+</head>
+
+<body class="bg-gray-50">
+
+<!-- NAV -->
+<nav class="bg-white shadow p-4 flex justify-between">
+    <h1 class="font-bold cursor-pointer" onclick="showPage('home')">TOVIC</h1>
+    <div class="space-x-4">
+        <button onclick="showPage('home')">Inicio</button>
+        <button onclick="showPage('tienda')">Tienda</button>
+    </div>
+</nav>
+
+<!-- HOME -->
+<section id="page-home" class="page active p-10 text-center">
+    <h1 class="text-4xl font-bold mb-4">Mosquiteras a medida</h1>
+    <button onclick="showPage('tienda')" class="bg-tovic-red text-white px-6 py-3 rounded">
+        Ir a tienda
+    </button>
+</section>
+
+<!-- TIENDA -->
+<section id="page-tienda" class="page p-10">
+
+<h2 class="text-2xl font-bold mb-6">Configurador</h2>
+
+<!-- CATEGORIA -->
+<div class="mb-6">
+    <button onclick="selectCategory('enrollable', this)" class="cat-btn border p-3">Enrollable</button>
+    <button onclick="selectCategory('plisada', this)" class="cat-btn border p-3">Plisada</button>
+</div>
+
+<!-- SUB -->
+<select id="subcat" class="border p-2 mb-4">
+    <option value="">Modelo</option>
+    <option value="rele">Rele</option>
+</select>
+
+<!-- MEDIDAS -->
+<div class="mb-4">
+    <input id="ancho" type="number" placeholder="Ancho" class="border p-2">
+    <input id="alto" type="number" placeholder="Alto" class="border p-2">
+</div>
+
+<!-- OPCIONES -->
+<select id="malla" class="border p-2 mb-4">
+    <option value="estandar">Estándar</option>
+    <option value="antipolen">Antipolen</option>
+</select>
+
+<label>
+<input type="checkbox" id="instalacion"> Instalación
+</label>
+
+<!-- RESULTADO -->
+<div class="mt-6">
+    <p id="precio" class="text-2xl font-bold">0€</p>
+</div>
+
+<button onclick="calcular()" class="bg-tovic-red text-white px-6 py-3 mt-4">
+Calcular
+</button>
+
+</section>
+
+<script>
+const config = {
+    enrollable: {
+        rele: { price: 45 }
+    },
+    plisada: { price: 90 }
+};
+
+let currentCat = null;
+
+/* NAVEGACIÓN */
+function showPage(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-'+page).classList.add('active');
+}
+
+/* CATEGORIA */
+function selectCategory(cat, el){
+    currentCat = cat;
+
+    document.querySelectorAll('.cat-btn')
+    .forEach(b=>b.classList.remove('bg-red-200'));
+
+    el.classList.add('bg-red-200');
+}
+
+/* CALCULO */
+function calcular(){
+
+    if(!currentCat){
+        alert("Selecciona categoría");
+        return;
+    }
+
+    let ancho = parseFloat(document.getElementById('ancho').value);
+    let alto = parseFloat(document.getElementById('alto').value);
+    let malla = document.getElementById('malla').value;
+    let instalacion = document.getElementById('instalacion').checked;
+    let modelo = document.getElementById('subcat').value;
+
+    if(!ancho || !alto){
+        alert("Introduce medidas");
+        return;
+    }
+
+    let base = 0;
+
+    if(currentCat === 'enrollable'){
+        if(!modelo){
+            alert("Selecciona modelo");
+            return;
+        }
+        base = config.enrollable[modelo].price;
+    } else {
+        base = config.plisada.price;
+    }
+
+    let m2 = (ancho * alto) / 1000000;
+    let precio = base + (m2 * 30);
+
+    if(malla === 'antipolen') precio += 15;
+    if(instalacion) precio += 45;
+
+    document.getElementById('precio').innerText = precio.toFixed(2) + "€";
+}
+</script>
+
+</body>
+</html>
